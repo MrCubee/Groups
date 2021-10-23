@@ -15,16 +15,14 @@ public class SQLDataBase {
 
     private final String host;
     private final String dataBase;
-    private final String table;
     private final String user;
     private final String password;
 
     private Connection connection;
 
-    protected SQLDataBase(String host, String dataBase, String table, String user, String password) {
+    protected SQLDataBase(String host, String dataBase, String user, String password) {
         this.host = host;
         this.dataBase = dataBase;
-        this.table = table;
         this.user = user;
         this.password = password;
     }
@@ -62,7 +60,7 @@ public class SQLDataBase {
         if (connection == null)
             return false;
         try {
-            statement = connection.prepareStatement("SELECT `uuid` FROM `" + this.table + "` WHERE `uuid` = ?");
+            statement = connection.prepareStatement("SELECT `uuid` FROM `groups` WHERE `uuid` = ?");
             statement.setString(1, uuid.toString().replaceAll("-", ""));
             resultSet = statement.executeQuery();
             return resultSet.next();
@@ -71,6 +69,50 @@ public class SQLDataBase {
         }
         return false;
     }
+
+    public String getPlayerName(UUID uuid) {
+        PreparedStatement statement;
+        ResultSet resultSet;
+
+        if (uuid == null)
+            return null;
+        connection = getConnection();
+        if (connection == null)
+            return null;
+        try {
+            statement = connection.prepareStatement("SELECT `name` FROM `mc_username` WHERE `uuid` = ? ORDER BY `register_date` DESC LIMIT 1");
+            statement.setString(1, uuid.toString().replaceAll("-", ""));
+            resultSet = statement.executeQuery();
+            if (!resultSet.next())
+                return null;
+            return resultSet.getString(1);
+        } catch (SQLException ignored) {
+            ignored.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean setPlayerName(UUID uuid, String name) {
+        Connection connection;
+        PreparedStatement statement;
+
+        if (uuid == null)
+            return false;
+        connection = getConnection();
+        if (connection == null)
+            return false;
+        try {
+            statement = connection.prepareStatement("INSERT `mc_username` VALUES (?, ?, DEFAULT) ON DUPLICATE KEY UPDATE `name` = ?");
+            statement.setString(1, uuid.toString().replaceAll("-", ""));
+            statement.setString(2, name);
+            statement.setString(3, name);
+            return statement.execute();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return false;
+    }
+
 
     public String getPlayerGroup(UUID uuid) {
         PreparedStatement statement;
@@ -82,7 +124,7 @@ public class SQLDataBase {
         if (connection == null)
             return null;
         try {
-            statement = connection.prepareStatement("SELECT `group` FROM `" + this.table + "` WHERE `uuid` = ?");
+            statement = connection.prepareStatement("SELECT `group` FROM `groups` WHERE `uuid` = ?");
             statement.setString(1, uuid.toString().replaceAll("-", ""));
             resultSet = statement.executeQuery();
             if (!resultSet.next())
@@ -105,7 +147,7 @@ public class SQLDataBase {
             return false;
         if (groupName == null) {
             try {
-                statement = connection.prepareStatement("DELETE FROM `" + this.table + "` WHERE `uuid` = ?");
+                statement = connection.prepareStatement("DELETE FROM `groups` WHERE `uuid` = ?");
                 statement.setString(1, uuid.toString().replaceAll("-", ""));
                 return statement.execute();
             } catch (SQLException exception) {
@@ -114,7 +156,7 @@ public class SQLDataBase {
             return false;
         }
         try {
-            statement = connection.prepareStatement("INSERT `" + this.table + "` VALUES (?, ?) ON DUPLICATE KEY UPDATE `group` = ?");
+            statement = connection.prepareStatement("INSERT `groups` VALUES (?, ?) ON DUPLICATE KEY UPDATE `group` = ?");
             statement.setString(1, uuid.toString().replaceAll("-", ""));
             statement.setString(2, groupName);
             statement.setString(3, groupName);
@@ -140,15 +182,14 @@ public class SQLDataBase {
         return "DataBase{" +
                 "host='" + this.host + '\'' +
                 ", dataBase='" + this.dataBase + '\'' +
-                ", table='" + this.table + '\'' +
                 ", user='" + this.user + '\'' +
                 ", connection=" + this.connection +
                 '}';
     }
 
-    public static SQLDataBase create(String host, String dataBase, String table, String user, String password) {
-        if (host == null || dataBase == null || table == null || user == null || password == null)
+    public static SQLDataBase create(String host, String dataBase, String user, String password) {
+        if (host == null || dataBase == null || user == null || password == null)
             return null;
-        return new SQLDataBase(host, dataBase, table, user, password);
+        return new SQLDataBase(host, dataBase, user, password);
     }
 }

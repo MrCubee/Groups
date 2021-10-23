@@ -62,7 +62,6 @@ public class Groups extends JavaPlugin implements Listener {
         }
         this.dataBase = SQLDataBase.create(sqlSection.getString("host"),
                 sqlSection.getString("database"),
-                sqlSection.getString("table"),
                 sqlSection.getString("user"),
                 sqlSection.getString("password"));
         getLogger().warning("Database: " + this.dataBase);

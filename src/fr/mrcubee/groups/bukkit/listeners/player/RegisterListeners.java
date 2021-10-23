@@ -16,5 +16,6 @@ public class RegisterListeners {
             return;
         pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerJoin(plugin), plugin);
+        pluginManager.registerEvents(new PlayerName(), plugin);
     }
 }

@@ -1,7 +1,6 @@
 database:
   host: localhost
   database: database
-  table: table
   user: user
   password: password
 groups:
