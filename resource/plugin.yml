@@ -1,0 +1,7 @@
+name: Groups
+version: 1.0
+author: MrCubee
+main: fr.mrcubee.groups.bukkit.Groups
+commands:
+  groups:
+    aliases: [g]

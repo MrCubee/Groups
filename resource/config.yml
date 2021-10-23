@@ -1,0 +1,50 @@
+database:
+  host: localhost
+  database: database
+  table: table
+  user: user
+  password: password
+groups:
+  admin:
+    permissions:
+      - 'bukkit.command.plugins'
+      - 'bukkit.command.stop'
+      - 'groups.command.set'
+      - 'groups.command.get'
+    inheritance:
+      - developer
+  developer:
+    permissions: []
+    inheritance:
+      - moderator
+  moderator:
+    permissions:
+      - 'minecraft.command.kick'
+      - 'minecraft.command.ban'
+      - 'minecraft.command.pardon'
+    inheritance:
+      - builder
+  builder:
+    permissions: []
+    inheritance:
+      - staff
+  staff:
+    permissions: []
+    inheritance:
+      - partner
+  partner:
+    permissions:
+      - 'minigame.command.forcestart'
+    inheritance:
+      - vip
+  vip:
+    permissions: []
+    inheritance:
+      - game_vip
+  game_vip:
+    permissions: []
+    inheritance:
+      - default
+  default:
+    permissions: []
+    inheritance: []
